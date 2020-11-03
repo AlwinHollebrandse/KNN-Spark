@@ -47,7 +47,7 @@ public class WordCount {
 	}
 
 	public static void makeLIBSVMFiles() throws FileNotFoundException, IOException {
-		String[] inputFileNames = {"superArffSmallTrain.txt", "smallArffTrain.txt", "mediumArffTrain.txt", "largeArffTrain.txt"};
+		String[] inputFileNames = {"superSmallTrain copy.txt", "smallTrain copy.txt", "mediumTrain copy.txt", "largeTrain copy.txt"};
 		String[] outputFileNames = {"superSmallTrain.txt", "smallTrain.txt", "mediumTrain.txt", "largeTrain.txt"};
 	
 		for (int i = 0; i < inputFileNames.length; i++) {
@@ -55,19 +55,23 @@ public class WordCount {
 			Scanner myFileReader = new Scanner(inputFile);
 
 			FileWriter outputFile = new FileWriter(outputFileNames[i]);
-			BufferedWriter bw = new BufferedWriter(outputFile);
-		    PrintWriter out = new PrintWriter(bw);
+			// BufferedWriter bw = new BufferedWriter(outputFile);
+		    // PrintWriter out = new PrintWriter(bw);
 			while (myFileReader.hasNextLine()) {
 				String currentLine = myFileReader.nextLine();
+				System.out.println(currentLine);
 				String[] values = currentLine.split(",");
 				StringBuilder result = new StringBuilder("");
 				result.append(values[values.length - 1]);
 				for (int j = 0; j < values.length- 1; j++) {
 					result.append(" " + (j+1) + ":" + values[j]);
 				}
-				out.println(result.toString());
+				result.append("\n");
+				// out.println(result.toString());
+				outputFile.write(result.toString());
 			}
 			myFileReader.close();
+			outputFile.close();
 		}
 	}
 }
