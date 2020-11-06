@@ -10,7 +10,7 @@ object KNN {
     def main(args: Array[String]): Unit = {
         val spark = SparkSession
 					.builder
-					.appName("DecisionTree")
+					.appName("KNN")
 					.config("spark.master", "local[4]")
 					.getOrCreate()
 
