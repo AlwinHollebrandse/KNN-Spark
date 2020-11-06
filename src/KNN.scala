@@ -45,6 +45,7 @@ object KNN {
 
         val nearestKClasses = findKNearestClasses(testData, trainData, k)
         // nearestKClasses.saveAsTextFile(args(1))
+        println("nearestKClasses: ", nearestKClasses.mkString(" "))
 
         spark.stop()
     }
@@ -56,14 +57,19 @@ object KNN {
 
     // def findKNearestClasses(testPoints: Array[Array[Double]], trainPoints: Array[Array[Double]], k: Int): Array[Int] = {
     // def findKNearestClasses(testPoints: DataFrame, trainPoints: DataFrame, k: Int): Array[Int] = {
-    def findKNearestClasses(testPointsDF: DataFrame, trainPointsDF: DataFrame, k: Int): Array[Int] = {
+    def findKNearestClasses(testPointsDF: DataFrame, trainPointsDF: DataFrame, k: Int): Array[Double] = {
         val trainPoints = trainPointsDF.select("features").collect.map(row => row.getAs[DenseVector](0).toArray)
-        println("inner trainPoints: ", trainPoints.foreach(println))
-        // val foo: Nothing = trainPoints
+        println("inner trainPoints: ")
+        trainPoints.foreach(println)
+        val trainPointsClasses = trainPointsDF.select("label").collect.map(row => row.getAs[Double](0))
+        println("inner trainPointsClasses: ")
+        trainPointsClasses.foreach(println)
+        // val foo: Nothing = trainPointsClasses
         // println("inner trainPoints string: ", trainPoints.foreach(e=>println(e.getClass)))
         val testPoints = testPointsDF.select("features").collect.map(row => row.getAs[DenseVector](0).toArray)
-        println("inner testPoints: ", testPoints.foreach(println))
+        println("inner testPoints: ")
         testPoints.map(row => println(row.toArray.mkString(" ")))
+        println("")
 
         // val trainPoints = trainPointsDF.map(row=>row.getSeq[Double](1)).collect
         // println("trainPoints: ", trainPoints.foreach(println))
@@ -91,19 +97,42 @@ object KNN {
         
         // return new Array[Int](1)
 
+        // val trainPoints = trainPointsDF.select("features").collect.map(row => row.getAs[DenseVector](0).toArray)
 
         testPoints.map { testInstance =>
             val distances = 
-                trainPoints.zipWithIndex.map { case (trainInstance, c) =>
-                    // c->println("trainInstance: ", trainInstance)
+                (trainPoints zip trainPointsClasses).map { case (trainInstance, c) =>
+                    c->println("trainInstance: ", trainInstance.mkString(" "))
                     c -> calcDistance(testInstance, trainInstance)
                 }
+            println("distances: ")
+            distances.foreach(println)
             val classes = distances.sortBy(_._2).take(k).map(_._1)
-            println("classes: ", classes)
+            println("classes: ")
+            classes.foreach(println)
+            // val foo: Nothing = classes
             val classCounts = classes.groupBy(identity).mapValues(_.size)
             println("classCounts: ", classCounts)
             classCounts.maxBy(_._2)._1
         }
+
+        // testPoints.map { testInstance =>
+        //     val distances = 
+        //         trainPoints.zipWithIndex.map { case (trainInstance, c) =>
+        //             c->println("trainInstance: ", trainInstance.mkString(" "))
+        //             c -> calcDistance(testInstance, trainInstance)
+        //         }
+        //     // val foo: Nothing = distances
+        //     println("distances: ")
+        //     distances.foreach(println)
+        //     val classes = distances.sortBy(_._2).take(k).map(_._1)
+        //     println("classes: ")
+        //     classes.foreach(println)
+        //     // val foo: Nothing = classes
+        //     val classCounts = classes.groupBy(identity).mapValues(_.size)
+        //     println("classCounts: ", classCounts)
+        //     classCounts.maxBy(_._2)._1
+        // }
     }
 
 
